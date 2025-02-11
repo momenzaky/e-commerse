@@ -14,6 +14,8 @@ import ProductDetails from './pages/ProductDetailes/ProductDetails';
 import NotFound from './pages/NotFound/NotFound';
 import { Offline, Online } from "react-detect-offline";
 import { CiWifiOff } from 'react-icons/ci';
+import CartContextProvider from './Context/CartContext';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -23,27 +25,33 @@ export default function App() {
       children: [
         { index: true, element: <ProtectedRoutes><Home /></ProtectedRoutes> },
         { path: "products", element: <ProtectedRoutes><Products /></ProtectedRoutes> },
-        { path: "cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
+        {
+          path: 'cart',
+          element: <ProtectedRoutes><Cart /></ProtectedRoutes>,
+        },
         { path: "productDetails/:productId", element: <ProtectedRoutes><ProductDetails /></ProtectedRoutes> },
         { path: "categories", element: <ProtectedRoutes><Categories /></ProtectedRoutes> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
-        {path:"*", element:<NotFound/>},
+        { path: "*", element: <NotFound /> },
       ],
     },
   ]);
 
   return (
     <TokenContextProvider>
-      <CounterContextProvider> 
-      <Offline>
-        <div className='offline fixed bottom-2 right-4 bg-green-100 p-3 font-semibold rounded z-50'>
-        <CiWifiOff className='inline mx-3 text-xl' />
-        You Are Offline
-        </div>
-        </Offline>
-        <RouterProvider router={routes} />
-      </CounterContextProvider>
+      <CartContextProvider>
+        <CounterContextProvider>
+          <Offline>
+            <div className='offline fixed bottom-2 right-4 bg-green-100 p-3 font-semibold rounded z-50'>
+              <CiWifiOff className='inline mx-3 text-xl' />
+              You Are Offline
+            </div>
+          </Offline>
+          <Toaster position='bottom-right' />
+          <RouterProvider router={routes} />
+        </CounterContextProvider>
+      </CartContextProvider>
     </TokenContextProvider>
   );
 }
