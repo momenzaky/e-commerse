@@ -5,10 +5,13 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import logo from './../../assets/download.png';
 import { CounterContext } from "../../Context/CounterContext";
 import { TokenContext } from "../../Context/TokenContext";
+import { FiShoppingCart } from "react-icons/fi";
+import { CartContext } from "../../Context/CartContext";
 
 export default function Navbar() {
   const { counter } = useContext(CounterContext);
   const { token, setToken } = useContext(TokenContext);
+  const {numOfCartItems} = useContext(CartContext)
   const navigate = useNavigate()
   function logoutUser() {
     localStorage.removeItem("token")
@@ -19,8 +22,8 @@ export default function Navbar() {
 
   return (
     <nav className="bg-slate-100 border-gray-200 dark:bg-gray-900">
-      <div className="w-full flex flex-wrap items-center justify-between mx-auto p-4">
-        <div className="flex items-center">
+      <div className=" p-4">
+        <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
             <img src={logo} className="h-8 me-3 w-8" alt="FlowBite Logo" />
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white mx-2">FreshCart</span>
@@ -32,21 +35,16 @@ export default function Navbar() {
             </svg>
           </button>
 
-          <div className="hidden w-full md:block " id="navbar-default">
-            <ul className="font-medium flex flex-col items-center p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700 md:flex md:justify-between">
-
+          <div className="hidden w-full  md:block " id="navbar-default">
+            <ul className="font-medium flex flex-col items-center p-4 md:p-0 mt-4 border  border-gray-100 rounded-lg bg-transparent md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700 md:flex md:justify-between">
               {token && (
                 <div className="flex flex-col md:flex-row md:space-x-8">
                   <li>
                     <NavLink to="/" className="block py-2 px-3 text-white bg-green-700 rounded-sm md:bg-transparent md:text-green-700 md:p-0 dark:text-white md:dark:text-green-500" aria-current="page">
-                      Home 
+                      Home
                     </NavLink>
                   </li>
-                  <li>
-                    <NavLink  to="/cart" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
-                      Cart
-                    </NavLink>
-                  </li>
+
                   <li>
                     <NavLink to="/products" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                       Products
@@ -65,7 +63,7 @@ export default function Navbar() {
                 </div>
               )}
 
-              <div className="flex flex-col md:flex-row md:space-x-8">
+              <div className="flex flex-col md:flex-row md:space-x-8 items-center">
                 <li><a href="#" className="block py-2 px-3 text-white bg-green-700 rounded-sm md:bg-transparent md:text-green-700 md:p-0 dark:text-white md:dark:text-green-500"><FaInstagram /></a></li>
                 <li><a href="#" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500"><FaFacebook /></a></li>
                 <li><a href="#" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500"><FaTiktok /></a></li>
@@ -73,14 +71,23 @@ export default function Navbar() {
                 <li><a href="#" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500"><FaLinkedin /></a></li>
                 <li><a href="#" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500"><FaYoutube /></a></li>
                 {token && (
-                  <li>
-                    <div
-                      onClick={() => { logoutUser(); }}
-                      className=" cursor-pointer block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500"
-                    >
-                      Sign Out
-                    </div>
-                  </li>
+                  <>
+                    <li>
+                      <NavLink to="/cart" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 relative md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                        <FiShoppingCart className="text-xl font-semibold" />
+                        <span className="absolute -top-3  -right-4 w-5 h-5 rounded-full flex justify-center items-center bg-green-500">{numOfCartItems}</span>
+                      </NavLink>
+                    </li>
+                    <li>
+                      <div
+                        onClick={() => { logoutUser(); }}
+                        className="cursor-pointer block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500"
+                      >
+                        Sign Out
+                      </div>
+                    </li>
+                  </>
+
                 )}
 
                 {!token && (
@@ -92,6 +99,7 @@ export default function Navbar() {
               </div>
             </ul>
           </div>
+
         </div>
       </div>
     </nav>

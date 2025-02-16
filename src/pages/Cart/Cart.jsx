@@ -3,11 +3,14 @@ import { Helmet } from 'react-helmet';
 import { CartContext } from '../../Context/CartContext';
 import Loader from '../../components/Loader/Loader';
 import { FaTrashCan } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [cartData, setCartData] = useState(null);
-  const { getLoggedCart, removeCartItem, updateProductQuantity, clearCart } = useContext(CartContext);
+  const navigate = useNavigate();
+  const { getLoggedCart, removeCartItem, updateProductQuantity, clearCart, setCartId, setNumOfCartItems } = useContext(CartContext);
+  const [paymentMethod, setPaymentMethod] = useState("cash"); 
 
   async function getData() {
     let data = await getLoggedCart();
@@ -17,29 +20,24 @@ export default function Cart() {
   }
 
   async function deleteProduct(productId) {
-    let response = await removeCartItem(productId);
-    setCartData(response.data);
+    let res = await removeCartItem(productId);
+    setCartData(res.data);
+    setCartId(res.cartId);
+    setNumOfCartItems(res.numOfCartItems);
   }
 
   async function updataProduct(productId, count) {
-    let data = await updateProductQuantity(productId, count);
-    setCartData(data.data);
-
+    let res = await updateProductQuantity(productId, count);
+    setCartData(res.data);
   }
-
- 
-
 
   useEffect(() => {
     getData();
   }, []);
 
-  const updateQuantity = (id, newQuantity) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+  const handlePaymentMethodChange = (e) => {
+    setPaymentMethod(e.target.value); 
+    console.log(`Selected Payment Method: ${e.target.value}`);
   };
 
   return (
@@ -47,10 +45,11 @@ export default function Cart() {
       <Helmet>
         <title>Cart</title>
       </Helmet>
+
       {cartData ? (
         <>
           <div className='flex justify-between my-4'>
-            <h4 className='text-2xl font-semibold'>Shopping Cart</h4>
+            <h4 className='text-2xl font-semibold text-green-600'>Shopping Cart</h4>
             <h6>
               <span className='font-semibold'>
                 Total Price:
@@ -58,7 +57,6 @@ export default function Cart() {
               {cartData?.totalCartPrice ? cartData.totalCartPrice : "0"} EGP
             </h6>
           </div>
-
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg my-4">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -117,11 +115,23 @@ export default function Cart() {
                       </td>
                     </tr>
                   ))
-                  : "No Data Found"}
+                  : "No Data Found"
+                }
               </tbody>
             </table>
           </div>
-          <button className='btn' >Clear</button>
+
+          <select className='btn' name="payment" id="payment" onChange={handlePaymentMethodChange}>
+            <option value="cash">Cash</option>
+            <option value="online">Online</option>
+          </select>
+
+          <button className='btn w-full' onClick={() => {
+            navigate("/checkout", { state: { paymentMethod: paymentMethod } })
+          }} >
+            Check Out
+          </button>
+
         </>
       ) : (
         <Loader />
