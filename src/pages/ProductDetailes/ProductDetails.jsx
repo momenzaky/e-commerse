@@ -20,7 +20,7 @@ const settings = {
 
 export default function ProductDetails() {
   const { productId } = useParams();
-  const { addToCart } = useContext(CartContext);
+  const { addToCart ,setCartId ,setNumOfCartItems } = useContext(CartContext);
 
   const [details, setDetails] = useState({});
   const [loading, setLoading] = useState(true);
@@ -32,6 +32,8 @@ export default function ProductDetails() {
       const res = await addToCart(id);
       console.log(res); 
       if (res.status === "success") {
+        setCartId(res.cartId);
+        setNumOfCartItems(res.numOfCartItems);
         toast.success(res.message, {
           className: "active",
           

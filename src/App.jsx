@@ -16,6 +16,10 @@ import { Offline, Online } from "react-detect-offline";
 import { CiWifiOff } from 'react-icons/ci';
 import CartContextProvider from './Context/CartContext';
 import { Toaster } from 'react-hot-toast';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; 
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import CheckOut from './pages/CheckOut';
+import AllOrders from './pages/AllOrders';
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -25,12 +29,11 @@ export default function App() {
       children: [
         { index: true, element: <ProtectedRoutes><Home /></ProtectedRoutes> },
         { path: "products", element: <ProtectedRoutes><Products /></ProtectedRoutes> },
-        {
-          path: 'cart',
-          element: <ProtectedRoutes><Cart /></ProtectedRoutes>,
-        },
+        { path: 'cart', element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
         { path: "productDetails/:productId", element: <ProtectedRoutes><ProductDetails /></ProtectedRoutes> },
         { path: "categories", element: <ProtectedRoutes><Categories /></ProtectedRoutes> },
+        { path: "checkout", element: <ProtectedRoutes><CheckOut /></ProtectedRoutes> },
+        { path: "allOrders", element: <ProtectedRoutes><AllOrders /></ProtectedRoutes> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
         { path: "*", element: <NotFound /> },
@@ -38,20 +41,31 @@ export default function App() {
     },
   ]);
 
+  const queryClient = new QueryClient(); 
+
   return (
-    <TokenContextProvider>
-      <CartContextProvider>
-        <CounterContextProvider>
-          <Offline>
-            <div className='offline fixed bottom-2 right-4 bg-green-100 p-3 font-semibold rounded z-50'>
-              <CiWifiOff className='inline mx-3 text-xl' />
-              You Are Offline
-            </div>
-          </Offline>
-          <Toaster position='bottom-right' />
-          <RouterProvider router={routes} />
-        </CounterContextProvider>
-      </CartContextProvider>
-    </TokenContextProvider>
+    <QueryClientProvider client={queryClient}> 
+      <TokenContextProvider>
+        <CartContextProvider>
+          <CounterContextProvider>
+            <Offline>
+              <div className='offline fixed bottom-2 right-4 bg-green-100 p-3 font-semibold rounded z-50'>
+                <CiWifiOff className='inline mx-3 text-xl' />
+                You Are Offline
+              </div>
+            </Offline>
+            <Online>
+              <div className='online fixed bottom-2 right-4 bg-blue-100 p-3 font-semibold rounded z-50'>
+                You Are Online
+              </div>
+            </Online>
+            <Toaster position='bottom-right' />
+            <ReactQueryDevtools initialIsOpen={false} />
+            <RouterProvider router={routes} />
+          </CounterContextProvider>
+        </CartContextProvider>
+      </TokenContextProvider>
+    </QueryClientProvider>
   );
 }
+

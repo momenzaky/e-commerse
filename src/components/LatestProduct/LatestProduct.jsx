@@ -6,14 +6,14 @@ import toast from 'react-hot-toast';
 import { CartContext } from '../../Context/CartContext';
 
 export default function LatestProduct() {
-  const [products, setProducts] = useState([]); 
-  const { addToCart } = useContext(CartContext); 
+  const [products, setProducts] = useState([]);
+  const { addToCart ,setCartId ,setNumOfCartItems } = useContext(CartContext);
 
-  
+
   async function getProducts() {
     try {
       const res = await axios.get("https://ecommerce.routemisr.com/api/v1/products");
-      setProducts(res.data.data); 
+      setProducts(res.data.data);
     } catch (err) {
       console.log(err);
     }
@@ -21,8 +21,10 @@ export default function LatestProduct() {
 
   async function addProduct(id) {
     try {
-      const res = await addToCart(id); 
+      const res = await addToCart(id);
       if (res.status === "success") {
+        setCartId(res.cartId);
+        setNumOfCartItems(res.numOfCartItems);
         toast.success(res.message, {
           className: "active",
         });
