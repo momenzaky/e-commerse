@@ -9,8 +9,7 @@ export default function CheckOut() {
     const { cashOnDelivery, setCartId, setNumOfCartItems, onlinePayment } = useContext(CartContext);
     const navigate = useNavigate();
     const { state } = useLocation();
-    console.log(state); 
-
+    console.log(state);
 
     const initialValues = {
         details: '',
@@ -29,15 +28,17 @@ export default function CheckOut() {
             let response = await onlinePayment({ shippingAddress: data });
             console.log(response);
             if (response.status === 'success') {
+                setNumOfCartItems(0);
                 window.location.href = response.session.url; 
             }
         } else {
             let response = await cashOnDelivery({ shippingAddress: data });
             console.log(response);
-           
+
             if (response.data.status) {
-                setCartId(null); 
-                setNumOfCartItems(0); 
+               
+                setCartId(null);
+                setNumOfCartItems(0);
                 navigate("/allOrders"); 
             }
         }
