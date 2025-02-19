@@ -7,6 +7,7 @@ import { CounterContext } from "../../Context/CounterContext";
 import { TokenContext } from "../../Context/TokenContext";
 import { FiShoppingCart } from "react-icons/fi";
 import { CartContext } from "../../Context/CartContext";
+import { FaCartShopping } from "react-icons/fa6";
 
 export default function Navbar() {
   const { counter } = useContext(CounterContext);
@@ -25,7 +26,7 @@ export default function Navbar() {
       <div className=" p-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src={logo} className="h-8 me-3 w-8" alt="FlowBite Logo" />
+          <FaCartShopping className="text-2xl text-green-600"/>
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white mx-2">FreshCart</span>
           </Link>
           <button data-collapse-toggle="navbar-default" type="button" className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
@@ -36,7 +37,7 @@ export default function Navbar() {
           </button>
 
           <div className="hidden w-full  md:block " id="navbar-default">
-            <ul className="font-medium flex flex-col items-center p-4 md:p-0 mt-4 border  border-gray-100 rounded-lg bg-transparent md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700 md:flex md:justify-between">
+            <ul className="font-medium flex flex-col items-center p-4 md:p-0 mt-4 border  border-gray-100 rounded-lg bg-transparent md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700 md:flex md:justify-between">
               {token && (
                 <div className="flex flex-col md:flex-row md:space-x-8">
                   <li>
@@ -51,14 +52,19 @@ export default function Navbar() {
                     </NavLink>
                   </li>
                   <li>
+                    <NavLink to="/wishList" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                      Wish List
+                    </NavLink>
+                  </li>
+                  <li>
                     <NavLink to="/categories" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                       Categories
                     </NavLink>
                   </li>
                   <li>
-                    <a href="#" className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                    <NavLink to={"/brand"} className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-green-700 md:p-0 dark:text-white md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                       Brands
-                    </a>
+                    </NavLink>
                   </li>
                 </div>
               )}

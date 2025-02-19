@@ -10,7 +10,7 @@ export default function Cart() {
   const [cartData, setCartData] = useState(null);
   const navigate = useNavigate();
   const { getLoggedCart, removeCartItem, updateProductQuantity, clearCart, setCartId, setNumOfCartItems } = useContext(CartContext);
-  const [paymentMethod, setPaymentMethod] = useState("cash"); 
+  const [paymentMethod, setPaymentMethod] = useState("cash");
 
   async function getData() {
     let data = await getLoggedCart();
@@ -20,10 +20,16 @@ export default function Cart() {
   }
 
   async function deleteProduct(productId) {
-    let res = await removeCartItem(productId);
-    setCartData(res.data);
-    setCartId(res.cartId);
-    setNumOfCartItems(res.numOfCartItems);
+    try {
+      let res = await removeCartItem(productId);
+
+      const updatedLoggedCart = await getLoggedCart();
+      setCartData(updatedLoggedCart.data);
+      setCartId(res.cartId);
+      setNumOfCartItems(res.numOfCartItems);
+    } catch (err) {
+      console.error('Error removing product from LoggedCart', err);
+    }
   }
 
   async function updataProduct(productId, count) {
@@ -31,12 +37,29 @@ export default function Cart() {
     setCartData(res.data);
   }
 
+  async function clearAll() {
+    try {
+      let response = await clearCart(); 
+      if (response.message === "success") {
+        setCartData(null);  
+        setCartItems([]);   
+        setNumOfCartItems(0);  
+      } else {
+       
+        console.error("Failed to clear cart:", response.message);
+      }
+    } catch (error) {
+      console.error("Error clearing the cart:", error);
+      
+    }
+  }
+
   useEffect(() => {
     getData();
   }, []);
 
   const handlePaymentMethodChange = (e) => {
-    setPaymentMethod(e.target.value); 
+    setPaymentMethod(e.target.value);
     console.log(`Selected Payment Method: ${e.target.value}`);
   };
 
@@ -57,6 +80,12 @@ export default function Cart() {
               {cartData?.totalCartPrice ? cartData.totalCartPrice : "0"} EGP
             </h6>
           </div>
+
+         
+          <button className='btn' onClick={clearAll}>
+            Clear
+          </button>
+
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg my-4">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -81,7 +110,9 @@ export default function Cart() {
                           alt={product.product?.title}
                         />
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">{product.product?.title}</td>
+                      <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                        {product.product?.title}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <button disabled={product.count === 1}
@@ -111,7 +142,9 @@ export default function Cart() {
                         {product.price} EGP
                       </td>
                       <td className="px-6 py-4">
-                        <button onClick={() => deleteProduct(product.product?._id)} className=" text-red-600 dark:text-red-500 hover:underline"><FaTrashCan className='text-2xl' /></button>
+                        <button onClick={() => deleteProduct(product.product?._id)} className=" text-red-600 dark:text-red-500 hover:underline">
+                          <FaTrashCan className='text-2xl' />
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -121,11 +154,13 @@ export default function Cart() {
             </table>
           </div>
 
+          
           <select className='btn' name="payment" id="payment" onChange={handlePaymentMethodChange}>
             <option value="cash">Cash</option>
             <option value="online">Online</option>
           </select>
 
+          
           <button className='btn w-full' onClick={() => {
             navigate("/checkout", { state: { paymentMethod: paymentMethod } })
           }} >

@@ -1,5 +1,4 @@
 import { useFormik } from 'formik';
-import style from './Register.module.css';
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';

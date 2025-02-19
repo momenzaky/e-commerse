@@ -13,7 +13,16 @@ function addToCart(productId, token) {
     .then((response) => response.data)
     .catch((err) => err);
 }
-
+function addToWishList(productId, token) {
+  return axios
+    .post(
+      `https://ecommerce.routemisr.com/api/v1/wishlist`,
+      { productId },
+      { headers: { token } }
+    )
+    .then((response) => response.data)
+    .catch((err) => err);
+}
 function getLoggedCart(token) {
   return axios
     .get("https://ecommerce.routemisr.com/api/v1/cart", {
@@ -22,7 +31,14 @@ function getLoggedCart(token) {
     .then((response) => response.data)
     .catch((err) => err);
 }
-
+function getLoggedWishList(token) {
+  return axios
+    .get("https://ecommerce.routemisr.com/api/v1/wishlist", {
+      headers: { token }
+    })
+    .then((response) => response.data)
+    .catch((err) => err);
+}
 function removeCartItem(productId, token) {
   if (!token) {
     return Promise.reject("You are not logged in. Please log in to continue.");
@@ -35,7 +51,30 @@ function removeCartItem(productId, token) {
     .then((response) => response.data)
     .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
 }
+function getUserOrders(productId, token) {
+  if (!token) {
+    return Promise.reject("You are not logged in. Please log in to continue.");
+  }
 
+  return axios
+    .get(`https://ecommerce.routemisr.com/api/v1/cart/${productId}`, {
+      headers: { token }
+    })
+    .then((response) => response.data)
+    .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
+}
+function removeWishListItem(productId, token) {
+  if (!token) {
+    return Promise.reject("You are not logged in. Please log in to continue.");
+  }
+
+  return axios
+    .delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, {
+      headers: { token }
+    })
+    .then((response) => response.data)
+    .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
+}
 function updateProductQuantity(productId, count, token) {
   if (!token) {
     return Promise.reject("You are not logged in. Please log in to continue.");
@@ -50,7 +89,6 @@ function updateProductQuantity(productId, count, token) {
     .then((response) => response.data)
     .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
 }
-
 function clearCart(token) {
   return axios
     .delete("https://ecommerce.routemisr.com/api/v1/cart", {
@@ -69,9 +107,8 @@ export default function CartContextProvider({ children }) {
     return axios.post(`https://ecommerce.routemisr.com/api/v1/orders/${cartId}`, data, {
       headers: { token }
     }).then((response) => response.data)
-    .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
+      .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
   }
-
   function onlinePayment(data) {
     return axios
       .post(
@@ -80,9 +117,8 @@ export default function CartContextProvider({ children }) {
         { headers: { token } }
       ).then((response) => response.data)
       .catch((err) => err.response ? err.response.data : { message: "An error occurred" });
-      
+
   }
-  
 
   useEffect(() => {
     if (token) {
@@ -109,6 +145,10 @@ export default function CartContextProvider({ children }) {
         setNumOfCartItems,
         cashOnDelivery,
         onlinePayment,
+        addToWishList: (productId) => addToWishList(productId, token),
+        getLoggedWishList: () => getLoggedWishList(token),
+        removeWishListItem: (productId) => removeWishListItem(productId, token),
+        getUserOrders,
       }}
     >
       {children}

@@ -20,6 +20,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import CheckOut from './pages/CheckOut';
 import AllOrders from './pages/AllOrders';
+import Brand from './pages/Brands/Brand';
+import WishList from './pages/WishList/WishList';
+import ForgetPassword from './pages/forgetPassword/ForgetPassword';
+import VerifyCode from './pages/VerifyCode/VerifyCode';
+import UpdataPassword from './pages/UpdataPassword/UpdataPassword';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
+
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -30,12 +37,18 @@ export default function App() {
         { index: true, element: <ProtectedRoutes><Home /></ProtectedRoutes> },
         { path: "products", element: <ProtectedRoutes><Products /></ProtectedRoutes> },
         { path: 'cart', element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
+        { path: 'wishList', element: <ProtectedRoutes><WishList /></ProtectedRoutes> },
         { path: "productDetails/:productId", element: <ProtectedRoutes><ProductDetails /></ProtectedRoutes> },
         { path: "categories", element: <ProtectedRoutes><Categories /></ProtectedRoutes> },
         { path: "checkout", element: <ProtectedRoutes><CheckOut /></ProtectedRoutes> },
+        { path: "brand", element: <ProtectedRoutes><Brand /></ProtectedRoutes> },
         { path: "allOrders", element: <ProtectedRoutes><AllOrders /></ProtectedRoutes> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
+        { path: "forgetPassword", element: <ForgetPassword /> },
+        { path: "verifyCode", element: <VerifyCode /> },
+        { path: "updataPassword", element: <UpdataPassword /> },
+        { path: "resetpassword", element: <ResetPassword /> },
         { path: "*", element: <NotFound /> },
       ],
     },
