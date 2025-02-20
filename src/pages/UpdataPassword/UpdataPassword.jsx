@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
+import { TokenContext } from '../../Context/TokenContext';
 
 export default function UpdatePassword() {
     const [message, setMessage] = useState(null); 
@@ -11,77 +12,76 @@ export default function UpdatePassword() {
     const navigate = useNavigate();
 
     const initialValues = {
-        email: '',
-        newPassword: '',
+        currentPassword: '',
+        password: '',
         rePassword: '',
     };
 
+    const { setToken } = useContext(TokenContext);
     const handleUpdatePassword = async (values) => {
         setIsLoading(true);
         try {
-            if (!values.email || !values.newPassword) {
-                setMessage("Email and new password are required.");
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                setMessage("User is not logged in.");
                 setIsLoading(false);
+                navigate("/login"); 
                 return;
             }
-    
-            if (values.newPassword !== values.rePassword) {
-                setMessage("Passwords do not match.");
-                setIsLoading(false);
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expirationTime = decodedToken.exp * 1000;
+            const currentTime = Date.now();
+
+            if (currentTime > expirationTime) {
+                setMessage("Token has expired. Please log in again.");
+                localStorage.removeItem("token");
+                navigate("/login"); 
                 return;
             }
-    
+
             const response = await axios.put(
-                'https://ecommerce.routemisr.com/api/v1/auth/resetPassword',
+                'https://ecommerce.routemisr.com/api/v1/users/changeMyPassword',
                 {
-                    email: values.email,
-                    newPassword: values.newPassword,
+                    currentPassword: values.currentPassword,
+                    password: values.password,
+                    rePassword: values.rePassword
                 },
                 {
                     headers: {
-                        'Content-Type': 'application/json', 
+                        Authorization: `Bearer ${token}`, 
                     },
                 }
             );
-    
-            console.log('Response data:', response.data);
-    
+
             if (response.data.status === 'success') {
-                setMessage('Password reset successfully.');
-                setIsLoading(false);
-    
+                setMessage('Password updated successfully.');
+
+                setToken(response.data.token); 
+                localStorage.setItem("token", response.data.token);
+
                 setTimeout(() => {
-                    navigate('/login');
-                }, 1000); 
-    
-                return; 
+                    navigate('/resetPassword');  
+                }, 2000);
             } else {
-                setMessage(response.data.message || "Failed to reset password.");
+                setMessage('Failed to update password.');
             }
         } catch (error) {
-            if (error.response) {
-                console.error("Error Response:", error.response);
-                setMessage(error.response.data.message || 'Failed to reset password.');
-            } else {
-                console.error("Error:", error.message);
-                setMessage("An error occurred: " + error.message);
-            }
+            setMessage(error.response?.data?.message || 'Failed to update password.');
         }
         setIsLoading(false);
     };
-    
-    
-    
-    
 
     const validationSchema = Yup.object({
-        email: Yup.string().email('Invalid email address').required('Email is required'),
-        newPassword: Yup.string()
+        currentPassword: Yup.string()
+            .required('Current password is required'),
+        password: Yup.string()
             .required('New password is required')
             .matches(/^[A-Za-z1-9]{8,12}$/, 'Password must be between 8 and 12 characters'),
         rePassword: Yup.string()
             .required('Confirm password is required')
-            .oneOf([Yup.ref('newPassword'), null], 'Passwords must match'),
+            .oneOf([Yup.ref('password'), null], 'Passwords must match'),
     });
 
     const formik = useFormik({
@@ -93,50 +93,50 @@ export default function UpdatePassword() {
     return (
         <section className="bg-gray-50 w-1/2 mx-auto dark:bg-gray-900 my-5">
             <Helmet>
-                <title>Reset Password</title>
+                <title>Update Password</title>
             </Helmet>
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                Reset Password
+                Update Password
             </h1>
 
             {message && <div className="bg-green-300 p-3 rounded-md my-2">{message}</div>}
 
             <form onSubmit={formik.handleSubmit}>
                 <div>
-                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                        Email
+                    <label htmlFor="currentPassword" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Current Password
                     </label>
                     <input
                         onChange={formik.handleChange}
-                        type="email"
-                        name="email"
-                        id="email"
+                        type="password"
+                        name="currentPassword"
+                        id="currentPassword"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
-                        placeholder="Enter your email"
-                        value={formik.values.email}
+                        placeholder="Enter your current password"
+                        value={formik.values.currentPassword}
                         onBlur={formik.handleBlur}
                     />
-                    {formik.touched.email && formik.errors.email && (
-                        <small className="text-red-600">{formik.errors.email}</small>
+                    {formik.touched.currentPassword && formik.errors.currentPassword && (
+                        <small className="text-red-600">{formik.errors.currentPassword}</small>
                     )}
                 </div>
 
                 <div>
-                    <label htmlFor="newPassword" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         New Password
                     </label>
                     <input
                         onChange={formik.handleChange}
                         type="password"
-                        name="newPassword"
-                        id="newPassword"
+                        name="password"
+                        id="password"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
                         placeholder="Enter your new password"
-                        value={formik.values.newPassword}
+                        value={formik.values.password}
                         onBlur={formik.handleBlur}
                     />
-                    {formik.touched.newPassword && formik.errors.newPassword && (
-                        <small className="text-red-600">{formik.errors.newPassword}</small>
+                    {formik.touched.password && formik.errors.password && (
+                        <small className="text-red-600">{formik.errors.password}</small>
                     )}
                 </div>
 
@@ -163,7 +163,7 @@ export default function UpdatePassword() {
                     type="submit"
                     className="text-white mt-2 bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
                 >
-                    {isLoading ? 'Updating...' : 'Reset Password'}
+                    {isLoading ? 'Updating...' : 'Update Password'}
                 </button>
             </form>
         </section>
