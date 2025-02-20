@@ -34,13 +34,10 @@ export default function CheckOut() {
         } else {
             let response = await cashOnDelivery({ shippingAddress: data });
             console.log(response);
-
-            if (response.data.status) {
-               
                 setCartId(null);
                 setNumOfCartItems(0);
                 navigate("/allOrders"); 
-            }
+            
         }
     }
 

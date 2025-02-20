@@ -25,7 +25,7 @@ import WishList from './pages/WishList/WishList';
 import ForgetPassword from './pages/forgetPassword/ForgetPassword';
 import VerifyCode from './pages/VerifyCode/VerifyCode';
 import UpdataPassword from './pages/UpdataPassword/UpdataPassword';
-import ResetPassword from './pages/ResetPassword/ResetPassword';
+
 
 
 export default function App() {
@@ -48,7 +48,6 @@ export default function App() {
         { path: "forgetPassword", element: <ForgetPassword /> },
         { path: "verifyCode", element: <VerifyCode /> },
         { path: "updataPassword", element: <UpdataPassword /> },
-        { path: "resetpassword", element: <ResetPassword /> },
         { path: "*", element: <NotFound /> },
       ],
     },
